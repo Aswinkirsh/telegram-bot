@@ -1,8 +1,23 @@
+import sqlite3
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, ContextTypes, filters
 from config import BOT_TOKEN, ADMINS
 
-FILES = []  # Stores uploaded files
+conn = sqlite3.connect("files.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_id TEXT NOT NULL
+)
+""")
+conn.commit()
+def get_all_files():
+    cursor.execute("SELECT file_id FROM files")
+    return [row[0] for row in cursor.fetchall()]
+
+
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -87,3 +102,4 @@ app.add_handler(
 )
 
 app.run_polling()
+
